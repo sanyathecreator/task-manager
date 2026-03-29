@@ -26,3 +26,27 @@ func Save(t model.Task) error {
 
 	return nil
 }
+
+func GetTasks() ([]model.Task, error) {
+	query := "SELECT * FROM tasks"
+	rows, err := db.DB.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var tasks []model.Task
+
+	for rows.Next() {
+		var task model.Task
+		err := rows.Scan(&task.ID, &task.Title, &task.Completed, &task.CreatedAt)
+
+		if err != nil {
+			return nil, err
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}

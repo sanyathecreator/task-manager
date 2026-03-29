@@ -9,7 +9,14 @@ import (
 )
 
 func getTasks(context *gin.Context) {
+	tasks, err := repository.GetTasks()
 
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not get data from database."})
+		return
+	}
+
+	context.JSON(http.StatusOK, tasks)
 }
 
 func createTask(context *gin.Context) {
