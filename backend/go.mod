@@ -2,7 +2,10 @@ module github.com/sanyathecreator/task-manager
 
 go 1.26.1
 
-require github.com/gin-gonic/gin v1.12.0
+require (
+	github.com/gin-gonic/gin v1.12.0
+	github.com/mattn/go-sqlite3 v1.14.37
+)
 
 require (
 	github.com/bytedance/gopkg v0.1.3 // indirect
