@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanyathecreator/task-manager/internal/model"
@@ -30,6 +31,7 @@ func createTask(context *gin.Context) {
 		return
 	}
 
+	task.CreatedAt = time.Now()
 	err = repository.SaveTask(task)
 
 	if err != nil {
