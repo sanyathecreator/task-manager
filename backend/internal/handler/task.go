@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sanyathecreator/task-manager/internal/model"
@@ -29,7 +30,7 @@ func createTask(context *gin.Context) {
 		return
 	}
 
-	err = repository.Save(task)
+	err = repository.SaveTask(task)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save task. Try again later."})
@@ -40,9 +41,61 @@ func createTask(context *gin.Context) {
 }
 
 func updateTask(context *gin.Context) {
+	taskId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse task id."})
+		return
+	}
+
+	_, err = repository.GetTaskById(taskId)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch task. Try again later."})
+		return
+	}
+
+	var task model.Task
+
+	err = context.ShouldBind(&task)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data."})
+		return
+	}
+
+	task.ID = taskId
+	err = repository.UpdateTask(task)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not update task. Try again later."})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Task updated", "task": task})
 }
 
 func deleteTask(context *gin.Context) {
+	taskId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse task id."})
+		return
+	}
+
+	task, err := repository.GetTaskById(taskId)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch task. Try again later."})
+		return
+	}
+
+	err = repository.DeleteTask(*task)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not delete task."})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Task deleted succesfully!"})
 }
