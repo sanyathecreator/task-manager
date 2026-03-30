@@ -32,7 +32,7 @@ func createTask(context *gin.Context) {
 	}
 
 	task.CreatedAt = time.Now()
-	err = repository.SaveTask(task)
+	err = repository.SaveTask(&task)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save task. Try again later."})

@@ -5,7 +5,7 @@ import (
 	"github.com/sanyathecreator/task-manager/internal/model"
 )
 
-func SaveTask(t model.Task) error {
+func SaveTask(t *model.Task) error {
 	query := `
 	INSERT INTO tasks(title, completed, created_at)
 	VALUES (?, ?, ?)`
@@ -18,11 +18,19 @@ func SaveTask(t model.Task) error {
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(t.Title, t.Completed, t.CreatedAt)
+	result, err := stmt.Exec(t.Title, t.Completed, t.CreatedAt)
 
 	if err != nil {
 		return err
 	}
+
+	id, err := result.LastInsertId()
+
+	if err != nil {
+		return err
+	}
+
+	t.ID = id
 
 	return nil
 }
